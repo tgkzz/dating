@@ -16,5 +16,9 @@ func NewWhatsappService(instanceId, authToken string) (*WhatsappService, error) 
 }
 
 func (ws *WhatsappService) SendMessage(message, to string) error {
-	panic("implement me")
+	return errors.New("method not implemented")
+}
+
+func (ws *WhatsappService) SetWebhook(url string) error {
+	return errors.New("method not implemented")
 }

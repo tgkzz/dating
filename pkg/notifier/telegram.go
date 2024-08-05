@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/imroc/req/v3"
+	"strings"
 	"time"
 )
 
@@ -27,14 +28,16 @@ type (
 		ChatId string `json:"chat_id"`
 		Text   string `json:"text"`
 	}
+
+	SetWebhook struct {
+		Url string `json:"url"`
+	}
 )
 
-// TODO: add another methods
 type TelegramService struct {
 	client *req.Client
 }
 
-// TODO: add req to set telegram webhook
 func NewTelegramService(token string) (*TelegramService, error) {
 	if token == "" {
 		return nil, errors.New("no token")
@@ -44,7 +47,7 @@ func NewTelegramService(token string) (*TelegramService, error) {
 
 	method := "getMe"
 
-	getMeResp, err := req.C().R().SetPathParam(Method, method).Get(fmt.Sprintf("/{%s}", Method))
+	getMeResp, err := client.R().SetPathParam(Method, method).Get(fmt.Sprintf("/{%s}", Method))
 
 	if err != nil {
 		return nil, fmt.Errorf("telegram returned error while logging %s", err.Error())
@@ -77,6 +80,36 @@ func (t *TelegramService) SendMessage(message, to string) error {
 
 	if resp.IsErrorState() {
 		return errors.New("telegram send error while sending error")
+	}
+
+	return nil
+}
+
+func (t *TelegramService) SetWebhook(url string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	method := "setWebhook"
+
+	body := SetWebhook{Url: url}
+
+	token, ok := strings.CutPrefix(t.client.BaseURL, TelegramBaseUrl)
+	if !ok {
+		return errors.New("cannot find telegram token in base url")
+	}
+
+	resp, err := t.client.R().
+		SetContext(ctx).
+		SetBody(&body).
+		SetHeader(TelegramSecretHeader, token).
+		SetPathParam(Method, method).
+		Post(fmt.Sprintf("/{%s}", Method))
+	if err != nil {
+		return err
+	}
+
+	if resp.IsErrorState() {
+		return errors.New("telegram send error while setting webhook")
 	}
 
 	return nil

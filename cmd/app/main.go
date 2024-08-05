@@ -1,11 +1,25 @@
 package main
 
 import (
-	"context"
+	"fmt"
+	"github.com/tgkzz/dating/pkg/notifier"
 )
 
 func main() {
-	ctx := context.Background()
+	not, err := notifier.CreateNotifierFactory()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
-	_ = ctx
+	telegramService, err := not.GetService(notifier.Telegram)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	if err := telegramService.SendMessage("asdqwezxcttk", "me"); err != nil {
+		fmt.Println(err)
+		return
+	}
 }

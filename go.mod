@@ -2,7 +2,10 @@ module github.com/tgkzz/dating
 
 go 1.22.0
 
-require github.com/imroc/req/v3 v3.43.7
+require (
+	github.com/imroc/req/v3 v3.43.7
+	github.com/joho/godotenv v1.5.1
+)
 
 require (
 	github.com/andybalholm/brotli v1.1.0 // indirect
